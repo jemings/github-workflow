@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "github-workflow",
-      "source": "./plugins/github-workflow",
+      "source": ".",
       "description": "Start/finish issue-based work sessions on a GitHub Project board (worktree isolation, dependency gates, stacked PRs) plus PR review, review-reply, and backlog-triage skills.",
       "version": "0.1.0",
       "author": {

@@ -19,7 +19,7 @@ Resolution order, on `source`:
 3. Otherwise they stay empty — the first board call prints a setup message and
    returns non-zero (sourcing itself never fails).
 
-`.github-workflow.config` example (see [`.github-workflow.config.example`](../../../.github-workflow.config.example)):
+`.github-workflow.config` example (see [`.github-workflow.config.example`](../.github-workflow.config.example)):
 
 ```bash
 CLAUDE_PROJECT_OWNER="your-org-login"

@@ -26,7 +26,7 @@ Backlog · Ready · In progress · In review · Approved · Done
 - **`jq`**, **`git`**, **`bash` 4+**.
 - An **org-scoped GitHub Project (v2)** with a single-select `Status` field whose
   options are exactly the six above. Create/configure it with
-  [`docs/board-setup.md`](plugins/github-workflow/docs/board-setup.md) or the
+  [`docs/board-setup.md`](docs/board-setup.md) or the
   helper `scripts/setup-board.sh`.
 - Optional: `shellcheck` (push-time lint of any shell scripts), `actionlint`
   (workflow lint).
@@ -59,7 +59,7 @@ you which `Status` options to set):
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-board.sh" --owner <your-org> --title "My Board" --repo /path/to/your-repo
 ```
 
-**B. Manual** — follow [`docs/board-setup.md`](plugins/github-workflow/docs/board-setup.md).
+**B. Manual** — follow [`docs/board-setup.md`](docs/board-setup.md).
 
 ## Configure
 
@@ -70,7 +70,7 @@ The functions need to know your board. Resolution order (first wins):
    [`.github-workflow.config.example`](.github-workflow.config.example) and fill it).
 
 If neither is set, the first board call prints a clear setup message and stops.
-Full options (hold labels, local CI hook): [`docs/configuration.md`](plugins/github-workflow/docs/configuration.md).
+Full options (hold labels, local CI hook): [`docs/configuration.md`](docs/configuration.md).
 
 ## Use
 
@@ -94,7 +94,7 @@ claude-cleanup-worktree <N>       # remove the worktree
 ```
 
 Policy details (board transitions, labels, closing keywords, worktree rules) live
-in [`docs/github-integration.md`](plugins/github-workflow/docs/github-integration.md).
+in [`docs/github-integration.md`](docs/github-integration.md).
 
 ## Push-time checks
 
@@ -102,36 +102,40 @@ Before creating a PR, `claude-close-issue` runs a **best-effort lint guard**
 (`shellcheck` on tracked `*.sh`/`*.bash` if installed; `actionlint` if installed)
 and an optional **local CI gate**. Builds/tests are project-specific, so the gate
 is pluggable — set `CLAUDE_LOCAL_CI_CMD` or add `.github-workflow/local-ci.sh`.
-See [`docs/configuration.md`](plugins/github-workflow/docs/configuration.md).
+See [`docs/configuration.md`](docs/configuration.md).
 
 ## Repository layout
 
+This is a **single-plugin marketplace**: the repo root is both the marketplace
+and the plugin, so `marketplace.json` (plugin `"source": "."`) and `plugin.json`
+share one root `.claude-plugin/`, and the plugin's components sit at the repo root.
+
 ```
-.claude-plugin/marketplace.json        # marketplace catalog
+.claude-plugin/
+├── marketplace.json                   # marketplace catalog (plugin source: ".")
+└── plugin.json                        # plugin manifest
 .github-workflow.config.example        # per-repo board config template
-plugins/github-workflow/
-├── .claude-plugin/plugin.json
-├── skills/
-│   ├── github-workflow/SKILL.md
-│   ├── gh-pr-reply/   (SKILL.md + references/)
-│   ├── gh-pr-approve/ (SKILL.md + references/)
-│   └── gh-triage/SKILL.md
-├── scripts/
-│   ├── github-workflow.sh             # function SSOT
-│   ├── test-github-workflow.sh        # pure-helper unit tests
-│   ├── shgwt.sh                       # git worktree spawn/teardown helper
-│   ├── test-shgwt.sh
-│   └── setup-board.sh                 # board bootstrap helper
-└── docs/
-    ├── github-integration.md          # policy SSOT
-    ├── board-setup.md                 # board creation + Status field
-    └── configuration.md               # env vars, config file, local CI hook
+skills/
+├── github-workflow/SKILL.md
+├── gh-pr-reply/   (SKILL.md + references/)
+├── gh-pr-approve/ (SKILL.md + references/)
+└── gh-triage/SKILL.md
+scripts/
+├── github-workflow.sh                 # function SSOT
+├── test-github-workflow.sh            # pure-helper unit tests
+├── shgwt.sh                           # git worktree spawn/teardown helper
+├── test-shgwt.sh
+└── setup-board.sh                     # board bootstrap helper
+docs/
+├── github-integration.md              # policy SSOT
+├── board-setup.md                     # board creation + Status field
+└── configuration.md                   # env vars, config file, local CI hook
 ```
 
 ## Develop / test
 
 ```bash
-cd plugins/github-workflow/scripts
+cd scripts
 bash test-github-workflow.sh   # pure-helper unit tests (no network)
 bash test-shgwt.sh             # worktree helper tests
 shellcheck -x -S warning github-workflow.sh shgwt.sh setup-board.sh

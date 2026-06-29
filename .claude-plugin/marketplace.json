@@ -1,0 +1,30 @@
+{
+  "name": "github-workflow",
+  "owner": {
+    "name": "jemings"
+  },
+  "description": "Issue-driven GitHub workflow skills for Claude Code, backed by a GitHub Project board.",
+  "plugins": [
+    {
+      "name": "github-workflow",
+      "source": "./plugins/github-workflow",
+      "description": "Start/finish issue-based work sessions on a GitHub Project board (worktree isolation, dependency gates, stacked PRs) plus PR review, review-reply, and backlog-triage skills.",
+      "version": "0.1.0",
+      "author": {
+        "name": "jemings"
+      },
+      "license": "Apache-2.0",
+      "homepage": "https://github.com/jemings/github-workflow",
+      "repository": "https://github.com/jemings/github-workflow",
+      "keywords": [
+        "github",
+        "workflow",
+        "issues",
+        "pull-requests",
+        "project-board",
+        "code-review",
+        "triage"
+      ]
+    }
+  ]
+}

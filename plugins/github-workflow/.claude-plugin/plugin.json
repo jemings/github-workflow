@@ -1,0 +1,20 @@
+{
+  "name": "github-workflow",
+  "version": "0.1.0",
+  "description": "Issue-driven GitHub workflow for Claude Code: start/finish issue sessions on a GitHub Project board, plus PR review, review-reply, and backlog-triage skills.",
+  "author": {
+    "name": "jemings"
+  },
+  "homepage": "https://github.com/jemings/github-workflow",
+  "repository": "https://github.com/jemings/github-workflow",
+  "license": "Apache-2.0",
+  "keywords": [
+    "github",
+    "workflow",
+    "issues",
+    "pull-requests",
+    "project-board",
+    "code-review",
+    "triage"
+  ]
+}

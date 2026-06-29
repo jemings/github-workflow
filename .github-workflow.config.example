@@ -1,0 +1,25 @@
+# github-workflow — per-repo board configuration (example)
+#
+# Copy this file to the ROOT of the repository you run the workflow in, named
+# exactly `.github-workflow.config`, and fill in your GitHub Project board.
+# `scripts/github-workflow.sh` sources it automatically (unless the variables
+# are already set in the environment, which always win).
+#
+#   cp .github-workflow.config.example /path/to/your-repo/.github-workflow.config
+#
+# Then add `.github-workflow.config` to that repo's .gitignore if you don't want
+# to commit it. Alternatively, skip the file and just export the two variables.
+
+# Organization login that owns the Project (org-scoped Projects only — see README).
+CLAUDE_PROJECT_OWNER="your-org-login"
+
+# Project number (the N in https://github.com/orgs/<org>/projects/N).
+CLAUDE_PROJECT_NUMBER=1
+
+# Optional: labels that make claude-enter-issue refuse an issue (a bash array).
+# Default is ("보류"). Uncomment to override, e.g. an English label:
+# CLAUDE_BLOCKED_LABELS=("blocked" "on-hold")
+
+# Optional: local CI gate command run before pushing a PR. See docs/configuration.md.
+# Receives GW_CI_BASE_REF / GW_CI_CHANGED / GW_CI_WITH_UI in the environment.
+# CLAUDE_LOCAL_CI_CMD="npm run lint && npm test"

@@ -55,16 +55,12 @@ assert_eq "기존 hooks 보존" "1" "$(jq -r '.hooks.x' "$DEST/settings.json")"
 CLAUDE_HUD_DEST="$DEST" bash "$INSTALL" >/dev/null
 assert_zero "재실행 idempotent" $?
 
-# 기존 스크립트가 다르면 exit=3, 원본 보존.
+# 기존 스크립트가 달라도 경고(stderr diff) 후 덮어씀 — 차단하지 않음.
 echo 'echo custom' >"$DEST/statusline-command.sh"
-CLAUDE_HUD_DEST="$DEST" bash "$INSTALL" >/dev/null 2>&1
-assert_eq "충돌 시 exit=3" "3" "$?"
-assert_eq "충돌 시 원본 보존" "custom" "$(bash "$DEST/statusline-command.sh" </dev/null 2>&1)"
-
-# FORCE=1 이면 덮어씀.
-CLAUDE_HUD_DEST="$DEST" FORCE=1 bash "$INSTALL" >/dev/null
-assert_zero "FORCE=1 덮어쓰기 exit=0" $?
-assert_zero "FORCE=1 후 원본과 동일" "$(diff -q "$DEST/statusline-command.sh" "$SCRIPT_DIR/statusline-command.sh" >/dev/null; echo $?)"
+STDERR_OUT="$(CLAUDE_HUD_DEST="$DEST" bash "$INSTALL" 2>&1 1>/dev/null)"
+assert_zero "커스터마이즈 있어도 설치 exit=0" $?
+assert_zero "덮어쓴 후 원본과 동일" "$(diff -q "$DEST/statusline-command.sh" "$SCRIPT_DIR/statusline-command.sh" >/dev/null; echo $?)"
+assert_zero "덮어쓸 때 경고 출력" "$([[ "$STDERR_OUT" == *"경고"* ]]; echo $?)"
 
 echo ""
 echo "── 결과 ───────────────────────────────────────────────────"

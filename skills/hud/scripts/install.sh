@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # hud 스킬 설치: 두 statusline 스크립트 배치 + settings.json statusLine 병합 + 동작 확인.
-# 기존 스크립트가 있고 내용이 다르면 diff 를 출력하고 exit 3 (FORCE=1 재실행 시 덮어씀).
+# 기존 스크립트가 있고 내용이 다르면 diff 를 경고로 stderr에 출력한 뒤 덮어쓴다.
 set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,10 +13,9 @@ command -v jq >/dev/null 2>&1 && command -v bash >/dev/null 2>&1 || {
 
 mkdir -p "$DEST"
 for f in statusline-command.sh statusline-tokens.sh; do
-  if [ -f "$DEST/$f" ] && [ "${FORCE:-0}" != "1" ] && ! diff -q "$SRC/$f" "$DEST/$f" >/dev/null 2>&1; then
-    echo "기존 $DEST/$f 가 설치할 내용과 다릅니다 (덮어쓰려면 FORCE=1 로 재실행):" >&2
-    diff -u "$DEST/$f" "$SRC/$f" || true
-    exit 3
+  if [ -f "$DEST/$f" ] && ! diff -q "$SRC/$f" "$DEST/$f" >/dev/null 2>&1; then
+    echo "경고: 기존 $DEST/$f 를 아래 내용으로 덮어씁니다:" >&2
+    diff -u "$DEST/$f" "$SRC/$f" >&2 || true
   fi
 done
 

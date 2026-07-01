@@ -15,8 +15,10 @@ allowed-tools: Bash, Read
 
 `scripts/install.sh`가 두 statusline 스크립트를 `~/.claude/`에 배치하고
 `~/.claude/settings.json`의 `statusLine` 필드를 병합한다. 결과는 모델명 ·
-작업 디렉터리(git 브랜치 포함) · 컨텍스트 사용률 · 세션 누적 토큰(↑입력/캐시,
-↓출력)을 한 줄로 보여주는 statusline이다.
+작업 디렉터리(git 브랜치 포함) · 컨텍스트 사용률 · 5시간 한도 사용률(`/usage`의
+"Current session"과 동일 값, 임계값별 색상) · 세션 누적 토큰(↑입력/캐시,
+↓출력)을 한 줄로 보여주는 statusline이다. 5시간 한도 세그먼트는 claude.ai
+구독 계정에만 표시되며, API 키 세션에서는 생략된다.
 
 ## Run
 

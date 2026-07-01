@@ -4,18 +4,23 @@
 
 input=$(cat)
 
-IFS=$'\t' read -r model cwd used_pct total_tokens < <(echo "$input" | jq -r '
+# 필드 구분자로 탭(\t) 대신 \x1f(unit separator) 사용 — bash read는 IFS가
+# space/tab/newline이면 연속 구분자를 하나로 squeeze해 빈 필드가 사라지므로
+# (rate_limits 등 값이 자주 비는 필드에서 뒤 필드들이 앞으로 밀리는 버그 유발),
+# @tsv 대신 join으로 직접 구성한다.
+IFS=$'\x1f' read -r model cwd used_pct total_tokens session_pct < <(echo "$input" | jq -r '
   (.context_window.current_usage // {}) as $u
   | [
       (.model.display_name // .model.id // "unknown"),
       (.cwd // ""),
-      (.context_window.used_percentage // ""),
+      (.context_window.used_percentage // "" | tostring),
       (($u.input_tokens // 0)
         + ($u.cache_read_input_tokens // 0)
         + ($u.cache_creation_input_tokens // 0)
-        | if . > 0 then tostring else "" end)
+        | if . > 0 then tostring else "" end),
+      (.rate_limits.five_hour.used_percentage // "" | tostring)
     ]
-  | @tsv
+  | join("")
 ')
 
 # 모델 표기 압축: "Opus 4.8 (1M context)" → "Opus 4.8 (1M)" (#1750).
@@ -87,7 +92,22 @@ GREEN="\033[32m"
 CYAN="\033[36m"
 YELLOW="\033[33m"
 MAGENTA="\033[35m"
+RED="\033[31m"
 DIM="\033[2m"
+
+# /usage 의 "Current session"(5시간 한도) 과 동일한 값 — 임계값별 색상 (#1750).
+session_segment=""
+if [ -n "$session_pct" ]; then
+    session_int=$(awk -v n="$session_pct" 'BEGIN{ printf "%.0f", n }')
+    if [ "$session_int" -ge 80 ]; then
+        session_color="$RED"
+    elif [ "$session_int" -ge 50 ]; then
+        session_color="$YELLOW"
+    else
+        session_color="$GREEN"
+    fi
+    session_segment="$(printf '%s5h:%s%%%s' "$session_color" "$session_int" "$RESET")"
+fi
 
 # 색으로 각 영역이 구분되므로 구분선(|) 없이 공백으로만 분리 (#1750).
 SEP=" "
@@ -103,6 +123,10 @@ fi
 if [ -n "$ctx_segment" ]; then
     out+="${SEP}"
     out+="${MAGENTA}${ctx_segment}${RESET}"
+fi
+if [ -n "$session_segment" ]; then
+    out+="${SEP}"
+    out+="${session_segment}"
 fi
 
 # 세션 누적 토큰 세그먼트 (#1750) — 헬퍼가 선행 구분자 포함 문자열 반환(transcript 없으면 빈 문자열).
